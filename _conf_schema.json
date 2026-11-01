@@ -1,0 +1,26 @@
+{
+  "vision_provider_id": {
+    "description": "视觉模型提供商 ID",
+    "type": "string",
+    "default": "",
+    "hint": "用来描述视频画面的视觉模型；留空时自动使用当前对话使用中的模型（推荐配置 GLM-4V 等免费视觉模型省 token）"
+  },
+  "grid_cols": {
+    "description": "画面拼图列数",
+    "type": "int",
+    "default": 3,
+    "hint": "拼图抽多少列画面，2~5；列数×行数是一次看的画面总数，越多 token 消耗越大"
+  },
+  "grid_rows": {
+    "description": "画面拼图行数",
+    "type": "int",
+    "default": 3,
+    "hint": "拼图抽多少行画面，2~5"
+  },
+  "min_brightness": {
+    "description": "黑帧亮度阈值",
+    "type": "float",
+    "default": 20.0,
+    "hint": "雪碧图空余格子是纯黑，平均亮度低于该值的画面会被过滤；抽到的画面全黑时调高"
+  }
+}
