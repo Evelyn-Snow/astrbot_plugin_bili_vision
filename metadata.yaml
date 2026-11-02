@@ -2,7 +2,7 @@ name: astrbot_plugin_bili_vision
 display_name: B站视频画面理解
 desc: 分享 B站视频链接时抽取画面让她“看”视频内容，不下载完整视频
 help: 群里或私聊发 B站视频链接并问“这视频讲了什么”，她会看画面回答
-version: v0.1.2
+version: v0.1.3
 repo: https://github.com/Evelyn-Snow/astrbot_plugin_bili_vision
 author: Evelyn-Snow
 support_platforms:

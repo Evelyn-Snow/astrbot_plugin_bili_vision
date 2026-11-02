@@ -12,6 +12,7 @@ import re
 import tempfile
 import urllib.parse
 import urllib.request
+from urllib.parse import urlsplit
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
 HEADERS = {"User-Agent": UA, "Referer": "https://www.bilibili.com/"}
@@ -28,16 +29,29 @@ def _get_json(url: str, timeout: int = 20) -> dict:
 def _download(url: str, dest: str, timeout: int = 30) -> str:
     if url.startswith("//"):
         url = "https:" + url
+    # 雪碧图地址来自 B站接口，仍限制在 B站图片域名内（防接口被污染时读任意地址）
+    host = (urlsplit(url).hostname or "").lower()
+    if not (host.endswith("hdslb.com") or host.endswith("bilibili.com")):
+        raise ValueError(f"拒绝下载非 B站域名资源：{host or url[:60]}")
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=timeout) as resp, open(dest, "wb") as fh:
         fh.write(resp.read())
     return dest
 
 
+_BILI_HOSTS = ("bilibili.com", "b23.tv")
+
+
+def _host_ok(host: str) -> bool:
+    host = (host or "").lower().rstrip(".")
+    return any(host == h or host.endswith("." + h) for h in _BILI_HOSTS)
+
+
 def resolve_video_id(url: str, timeout: int = 15) -> tuple[str, str]:
     """把各种 B站链接解析为 (类型, ID)：('bvid', 'BV...') 或 ('aid', '123')。
 
-    支持 b23.tv 短链（跟随跳转）、bilibili.com/video/BVxxx、av号。
+    支持 b23.tv 短链（手动跟随跳转，逐跳校验域名）、bilibili.com/video/BVxxx、av号。
+    只允许 B站域名，避免被诱导访问内网或任意站点。
     """
     text = str(url or "").strip()
     match = _BV_RE.search(text)
@@ -47,15 +61,28 @@ def resolve_video_id(url: str, timeout: int = 15) -> tuple[str, str]:
     if match:
         return "aid", match.group(1)
     if "b23.tv" in text:
-        req = urllib.request.Request(text, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            final = resp.geturl()
-        match = _BV_RE.search(final)
-        if match:
-            return "bvid", match.group(1)
-        match = _AV_RE.search(final)
-        if match:
-            return "aid", match.group(1)
+        parsed = urlsplit(text if "://" in text else "https://" + text)
+        if parsed.scheme not in ("http", "https"):
+            raise ValueError("短链协议不被允许")
+        if not _host_ok(parsed.hostname or ""):
+            raise ValueError(f"短链域名不在允许范围（{parsed.hostname or '未知'}）")
+        current = text if "://" in text else "https://" + text
+        for _ in range(5):
+            req = urllib.request.Request(current, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                final = resp.geturl()
+            host = (urlsplit(final).hostname or "").lower()
+            if not _host_ok(host):
+                raise ValueError(f"短链跳转到了非 B站域名（{host or '未知'}），已停止")
+            match = _BV_RE.search(final)
+            if match:
+                return "bvid", match.group(1)
+            match = _AV_RE.search(final)
+            if match:
+                return "aid", match.group(1)
+            if final == current:
+                break
+            current = final
     raise ValueError("链接里没有识别到 BV 号或 av 号")
 
 
