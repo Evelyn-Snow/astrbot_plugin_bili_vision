@@ -1,2 +1,3 @@
 pillow
 bilibili-api-python>=17.0
+psutil

@@ -1,4 +1,9 @@
 {
+  "enabled": {
+    "description": "启用 B站视频理解",
+    "type": "bool",
+    "default": true
+  },
   "vision_provider_id": {
     "description": "视觉模型提供商 ID",
     "type": "string",
@@ -43,5 +48,71 @@
     "type": "int",
     "default": 5000,
     "hint": "字幕过长时保留开头 70% 和结尾 30%，中间省略；太大容易挤占聊天上下文"
+  },
+  "asr_enabled": {
+    "description": "没有字幕时后台听音频",
+    "type": "bool",
+    "default": false,
+    "hint": "开启后，没有字幕的视频会先回画面理解，再在后台用本地 faster-whisper 转写音频，完成后补一条听后感"
+  },
+  "asr_python": {
+    "description": "ASR 专用 Python",
+    "type": "string",
+    "default": "",
+    "hint": "装了 faster-whisper 的 Python 解释器路径；不和 AstrBot 主环境共用，留空则用当前解释器"
+  },
+  "asr_model": {
+    "description": "Whisper 模型",
+    "type": "string",
+    "default": "small",
+    "hint": "small 在 N100 上实时率约 0.3~0.45；更小的 tiny/base 更快但中文准确率下降"
+  },
+  "asr_threads": {
+    "description": "ASR 线程数",
+    "type": "int",
+    "default": 2,
+    "hint": "留 2 个核给 AstrBot 和 QQ，避免转写时整机卡顿"
+  },
+  "asr_compute_type": {
+    "description": "ASR 计算精度",
+    "type": "string",
+    "default": "int8",
+    "hint": "CPU 推荐 int8；有独显可改 float16 并另配 device（需自行改 worker）"
+  },
+  "asr_max_minutes": {
+    "description": "最长转写分钟数",
+    "type": "int",
+    "default": 15,
+    "hint": "超过这个时长的视频不转写，只根据画面理解"
+  },
+  "asr_timeout_seconds": {
+    "description": "ASR 超时秒数",
+    "type": "int",
+    "default": 900,
+    "hint": "整个转写子进程的最长运行时间，超时会杀掉并回一句看不下去了"
+  },
+  "asr_language": {
+    "description": "转写语言",
+    "type": "string",
+    "default": "",
+    "hint": "留空自动识别；固定中文填 zh，但中英混讲时可能把英文翻成中文"
+  },
+  "asr_initial_prompt": {
+    "description": "转写提示词",
+    "type": "string",
+    "default": "",
+    "hint": "可填视频里常见的人名、术语，帮助模型写对专有名词；太长会拖慢速度"
+  },
+  "asr_download_root": {
+    "description": "Whisper 模型缓存目录",
+    "type": "string",
+    "default": "",
+    "hint": "留空用默认缓存；换机器时可指向已下载好的模型目录，避免重复下载"
+  },
+  "asr_ffmpeg": {
+    "description": "ffmpeg 路径",
+    "type": "string",
+    "default": "",
+    "hint": "留空自动找 PATH 或启动器自带的 ffmpeg"
   }
 }

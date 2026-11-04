@@ -1,8 +1,8 @@
 name: astrbot_plugin_bili_vision
 display_name: B站视频理解
-desc: 分享 B站视频链接时把字幕和画面合起来理解，不下载完整视频
-help: 群里或私聊发 B站视频链接并问“这视频讲了什么”，她会读字幕看画面回答
-version: v0.2.0
+desc: 分享 B站视频链接时把字幕、画面和音频合起来理解，没有字幕也能在后台听完
+help: 群里或私聊发 B站视频链接并问“这视频讲了什么”，她会读字幕看画面回答；没有字幕时会在后台听音频，过一会儿补一条听后感
+version: v0.3.0
 repo: https://github.com/Evelyn-Snow/astrbot_plugin_bili_vision
 author: Evelyn-Snow
 support_platforms:
