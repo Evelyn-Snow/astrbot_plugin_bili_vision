@@ -22,5 +22,26 @@
     "type": "float",
     "default": 20.0,
     "hint": "雪碧图空余格子是纯黑，平均亮度低于该值的画面会被过滤；抽到的画面全黑时调高"
+  },
+  "bilibili_cookie": {
+    "description": "B站 Cookie（用于字幕）",
+    "type": "object",
+    "items": {
+      "sessdata": {
+        "description": "sessdata",
+        "type": "string"
+      },
+      "id": {
+        "description": "bili_jct",
+        "type": "string"
+      }
+    },
+    "hint": "留空则只能看画面。B站部分字幕接口需要登录态；Cookie 只存本机配置，不会写日志或提交到 Git"
+  },
+  "max_subtitle_chars": {
+    "description": "字幕最多带多少字",
+    "type": "int",
+    "default": 5000,
+    "hint": "字幕过长时保留开头 70% 和结尾 30%，中间省略；太大容易挤占聊天上下文"
   }
 }
